@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Arcade Tennis</title>
+	<link rel='stylesheet' type='text/css' href='https://fonts.googleapis.com/css?family=Titillium+Web&text=0123456789'>
+	<style>
+    	* { 
+    		padding: 0; 
+    		margin: 0; 
+    	} 
+		#playersNames {
+			display: block;
+		}
+		#playersNames input {
+			background: #ccc;
+			border: 2px solid #ccc;
+			border-radius: 5px;
+			padding: 3px;
+			font-family: "LCD-7", sans-serif;
+		}
+		#playersNames input:hover,
+		#playersNames input:focus {
+			background: #fff;
+		}
+		#score, p {
+    		background-color: #ddd;
+    		color: #777;
+    		display: block;
+    		font-family: "LCD-7";
+    		margin: 0 auto;
+    		padding: 10px 0;
+    		text-align: center;
+    		width: 500px;
+    	}
+    	canvas { 
+    		background: #ccc; 
+    		display: block; 
+    		margin: 0 auto; 
+    	}
+	</style>
+</head>
+<body>
+	<form id="playersNames">
+		<input type="text" class="player1Name" value="Player 1" placeholder="Player 1">
+		<input type="text" class="player2Name" value="Player 2" placeholder="Player 2">
+	</form>
+	
+</body>
+</html>
