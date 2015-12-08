@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Tennis</title>
+    <style>
+    	@font-face {
+    		font-family: "LCD-7";
+    		src: url("RrDmIrR7.ttf");
+    	}
+    	* { 
+    		padding: 0; 
+    		margin: 0; 
+    	} 
+
+        #header {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            border: 1px solid #ccc;
+        }
+        .player {
+            width: 50%;
+            background: #ccc;
+            position: relative;
+        }
+        .player1 { float: left;  }
+        .player2 { float: right; }
+        .player input[type="text"] {
+            display: inline-block;
+            width: 80%;
+            margin: 0 auto;
+            background: #aaa;
+        }
+        .player input[type="text"]:hover,
+        .player input[type="text"]:focus {
+            background: #fff;
+        }
+        .player input[type="submit"] {
+            display: inline-block;
+            width: 10%;
+            position: absolute;
+        }
+
+    	#score, p {
+    		background-color: #ddd;
+    		color: #777;
+    		display: block;
+    		font-family: "LCD-7";
+    		margin: 0 auto;
+    		padding: 10px 0;
+    		text-align: center;
+    		width: 500px;
+            clear: both;
+    	}
+
+    	canvas { 
+    		background: #ccc; 
+    		display: block; 
+    		margin: 0 auto; 
+    	}
+    </style>
+</head>
+<body>
+	<div id="header">
+        <div class="player player1"><input type="text" value="Player 1" placeholder="Player 1"></div>
+        <div class="player player2"><input type="text" value="Player 2" placeholder="Player 2"></div>
+        <div id="score"></div>
+    </div>
+	<canvas id="myCanvas" width="500" height="320"><p>Canvas here? No canvas here.</p></canvas>
+
+</body>
+</html>
