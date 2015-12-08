@@ -1,0 +1,225 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Tennis</title>
+    <style>
+    	@font-face {
+    		font-family: "LCD-7";
+    		src: url("RrDmIrR7.ttf");
+    	}
+    	* { 
+    		padding: 0; 
+    		margin: 0; 
+    	} 
+    	#score, p {
+    		background-color: #ddd;
+    		color: #777;
+    		display: block;
+    		font-family: "LCD-7";
+    		margin: 0 auto;
+    		padding: 10px 0;
+    		text-align: center;
+    		width: 500px;
+    	}
+    	canvas { 
+    		background: #ccc; 
+    		display: block; 
+    		margin: 0 auto; 
+    	}
+    </style>
+</head>
+<body>
+	<div id="score"></div>
+	<canvas id="myCanvas" width="500" height="320"><p>Canvas here? Are you serious?</p></canvas>
+
+	<script>
+    window.onload = function() {
+      // the game area
+	  var canvas = document.getElementById("myCanvas");
+	  if(canvas.getContext) {
+	  	var ctx = canvas.getContext("2d");
+		// FF, I'm watching you =_=
+		document.onkeypress = function() { return false; };
+		// score
+		var scoreArea = document.getElementById("score");
+		var result = [0, 0];
+		function showScore() {
+			if(scoreArea.firstChild) { scoreArea.removeChild(scoreArea.firstChild); }
+			scoreArea.appendChild(document.createTextNode(result[0] + " : " + result[1]));
+		}
+		showScore();
+		// players, names, AI?
+		// player's name 1st character to upper case
+		function politeness(player) {
+			return player.charAt(0).toUpperCase() + player.substring(1);
+		}
+		// ask user for the names and # of players
+		var playerNameR = prompt("Right player name: ", "") || "Right player";
+		playerNameR = politeness(playerNameR);
+		var secondPlayer = confirm("Would you like to play with your friend? If \"No\", you'll play single.");
+		if(secondPlayer) {
+			var playerNameL = prompt("Left player name: ", "") || "Left player";
+			playerNameL = politeness(playerNameL);
+		} else  {
+			playerNameL = "Artificial Intelligence";
+		}
+		// ball radius to be easily editable
+		var ballRadius = 10;
+		// start coordinates for ball
+		var x = canvas.width - 30;
+		var y = canvas.height / 2;
+		// ball speed
+		var dx = 2;
+		var dy = -2;
+		// barrier speed
+		var speed = 3;
+		// players' barriers
+		var barrierHeight = 75;
+		var barrierWidth = 10;
+		var barrierXL = 0;
+		var barrierYL = (canvas.height - barrierHeight) / 2;
+		var barrierXR = canvas.width - barrierWidth;
+		var barrierYR = (canvas.height - barrierHeight) / 2;
+		// keyboard btns status
+		var topPressedL = false;
+		var bottomPressedL = false;
+		var topPressedR = false;
+		var bottomPressedR = false;
+
+		function keyDownHandler(e) {
+			var e = e || window.event;
+			if(e.keyCode == 38) {
+				topPressedR = true;
+			} else if(e.keyCode == 40) {
+				bottomPressedR = true;
+			}
+			if(secondPlayer) {
+				if(e.keyCode == 87) {
+					topPressedL = true;
+				} else if(e.keyCode == 83) {
+					bottomPressedL = true;
+				}
+			}
+		}
+		function keyUpHandler(e) {
+			var e = e || window.event;
+			if(e.keyCode == 38) {
+				topPressedR = false;
+			} else if(e.keyCode == 40) {
+				bottomPressedR = false;
+			}
+			if(secondPlayer) {
+				if(e.keyCode == 87) {
+					topPressedL = false;
+				} else if(e.keyCode == 83) {
+					bottomPressedL = false;
+				}
+			}
+		}
+		document.addEventListener("keydown", keyDownHandler, false); // type, listener[, useCapture]
+		document.addEventListener("keyup", keyUpHandler, false);
+		// drawing ball
+		function drawBall() {
+			ctx.beginPath();
+			ctx.arc(x, y, ballRadius, 0, Math.PI*2); // x, y, radius, start angle, finish angle[, direction of path]
+			ctx.fillStyle = "rgba(255, 100, 0, 0.8)";
+			ctx.fill();
+			ctx.closePath();
+		}
+		// drawing barriers
+		function drawBarrierR() {
+			ctx.beginPath();
+			ctx.rect(barrierXR, barrierYR, barrierWidth, barrierHeight);
+			ctx.fillStyle = "rgba(156, 255, 0, 0.8)";
+			ctx.fill();
+			ctx.closePath();
+		}
+		function drawBarrierL() {
+			ctx.beginPath();
+			ctx.rect(barrierXL, barrierYL, barrierWidth, barrierHeight);
+			ctx.fillStyle = "rgba(0, 156, 255, 0.8)";
+			ctx.fill();
+			ctx.closePath();
+		}
+		// in case of game over
+		function loose(player) {
+			clearInterval(painter);
+			var decide = confirm(player + " won. Want to play again?");
+			if(decide) {
+				x = canvas.width  / 2;
+				y = canvas.height / 2;
+				// normalize speed
+				dx = (dx / dx) * 2;
+				dy = (dy / dy) * 2;
+				painter = setInterval(draw, 10);
+			}
+		}
+		// drawing elements' change position
+		function draw() {
+			ctx.clearRect(0, 0, canvas.width, canvas.height); // clear the whole canvas area
+			drawBall();
+			drawBarrierL();
+			drawBarrierR();
+			// colissions: ball - walls - barriers
+			// ball
+			if(x + dx < ballRadius + barrierWidth) { // left
+				if(y > barrierYL && y < barrierYL + barrierHeight) {
+					dx = -dx;
+				} else if( (y <= barrierYL && y >= barrierYL - ballRadius) || (y >= barrierYL + barrierHeight && y <= barrierYL + barrierHeight + ballRadius) ) { // top or bottom corner - reverse move
+					dx = -dx;
+					dy = -dy;
+				} else {
+					result[0] += 1;
+					showScore();
+					loose(playerNameR);
+				}
+			} else if(x + dx > canvas.width - ballRadius - barrierWidth) { // right
+				if(y > barrierYR && y < barrierYR + barrierHeight) {
+					dx = -dx;
+				} else if( (y <= barrierYR && y >= barrierYR - ballRadius) || (y >= barrierYR + barrierHeight && y <= barrierYR + barrierHeight + ballRadius) ) { // top or bottom corner - reverse move
+					dx = -dx;
+					dy = -dy;
+				} else {
+					result[1] += 1;
+					showScore();
+					loose(playerNameL);
+				}
+			}
+			if(y + dy < ballRadius) { // top
+				dy = -dy;
+			} else if(y + dy > canvas.height - ballRadius) { // bottom
+				dy = -dy;
+			}
+			x += dx;
+			y += dy;
+			// barrier
+			if(topPressedR && barrierYR > 0) {
+				barrierYR -= speed;
+			} else if(bottomPressedR && barrierYR < (canvas.height - barrierHeight) ) {
+				barrierYR += speed;
+			}
+			if(secondPlayer) {
+				if(topPressedL && barrierYL > 0) {
+					barrierYL -= speed;
+				} else if(bottomPressedL && barrierYL < (canvas.height - barrierHeight) ) {
+					barrierYL += speed;
+				}
+			} else { // AI
+				if(barrierYL > y && x < canvas.width / 2 && dx < 0) { // move upper
+					barrierYL -= speed;
+				} else if(barrierYL + barrierHeight < y && x < canvas.width / 2 && dx < 0) { // move lower
+					barrierYL += speed;
+				} else if(barrierYL > canvas.height / 2 && dx > 0) {
+					barrierYL -= 1;
+				} else if(barrierYL + barrierHeight < canvas.height / 2 && dx > 0) {
+					barrierYL += 1;
+				}
+			}
+		}
+		var painter = setInterval(draw, 10);
+	  }
+	}
+	</script>
+</body>
+</html>
